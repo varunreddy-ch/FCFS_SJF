@@ -1,9 +1,6 @@
 
 let count = 0;
 
-function changeCPU() {
-    turnaroundTime = 0; // resetting the variable for each new process.
-}
 
 
 function addRows() { 
@@ -51,6 +48,13 @@ function addRows() {
       const noOfCPUs = parseInt(document.getElementById('noOfCPUs').value, 10);
       let cpus = new Array(noOfCPUs).fill(0); // Track end time for each CPU
       let totalTurnaroundTime = 0;
+
+
+      
+      let jobsData = []
+      for(let i=0; i < noOfCPUs; i++) {
+        jobsData.push([]);
+      }
   
       for (let i = 1; i < table.rows.length; i++) {
           const row = table.rows[i];
@@ -73,6 +77,10 @@ function addRows() {
   
           // Accumulate total turnaround time
           totalTurnaroundTime += turnaroundTime;
+
+          
+          jobsData[cpuIndex].push({ jobNumber: i, startTime: startTime, endTime: endTime })
+          drawGanttChart(jobsData, 'ganttChartCanvas', jobsData);
       }
   
       // Display total turnaround time
@@ -87,6 +95,13 @@ function addRows() {
       let cpus = new Array(noOfCPUs).fill(0); // Track end time for each CPU
       let jobs = [];
       let totalTurnaroundTime = 0;
+
+
+      let jobsData = []
+      for(let i=0; i < noOfCPUs; i++) {
+        jobsData.push([]);
+      }
+    
   
       // Extract jobs data from the table
       for (let i = 1; i < table.rows.length; i++) {
@@ -141,6 +156,13 @@ function addRows() {
                 // Accumulate total turnaround time
                 totalTurnaroundTime += turnaroundTime;
 
+
+
+
+                // Adding data to plot chart
+
+                jobsData[cpuIndex].push({ jobNumber: job1.index-1, startTime: startTime, endTime: endTime })
+                drawGanttChart(jobsData, 'ganttChartCanvas', jobsData);
                 temp++;
             }
             else {
@@ -171,3 +193,63 @@ function addRows() {
     // Display total turnaround time
     document.getElementById('totalTurnaroundTime').innerText = totalTurnaroundTime/count;
   }
+
+
+
+
+  function drawGanttChart(jobsData, canvasId, jobsData) {
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+    
+    // Set the width and height of the canvas
+    canvas.width = 500;
+    canvas.height = 200;
+    
+    const cpuHeight = canvas.height / jobsData.length; // Height of each CPU row
+    const maxTime = Math.max(...jobsData.map(cpu => Math.max(...cpu.map(job => job.endTime))));
+    const timeScale = canvas.width / maxTime; // Scale to fit all jobs in the canvas width
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    
+    // Draw the jobs on the canvas
+    jobsData.forEach((cpuJobs, cpuIndex) => {
+      cpuJobs.forEach(job => {
+        const startX = job.startTime * timeScale;
+        const jobWidth = (job.endTime - job.startTime) * timeScale;
+        
+        // Draw the job rectangle
+        ctx.beginPath();
+        ctx.rect(startX, cpuHeight * cpuIndex, jobWidth, cpuHeight - 5);
+        ctx.fillStyle = getRandomColor(); // Get a random color for each job
+        ctx.fill();
+        ctx.stroke();
+        
+        // Add text (job name) on the rectangle
+        ctx.fillStyle = 'black';
+        ctx.fillText(`J${job.jobNumber}`, startX + 5, cpuHeight * cpuIndex + cpuHeight / 2);
+      });
+    });
+  }
+  
+  function getRandomColor() {
+    // Random color for the job rectangles
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+  
+  // Example usage:
+  // Assuming jobsData is an array of arrays, with each sub-array representing jobs scheduled on one CPU
+  // Each job object has jobNumber, startTime, and endTime properties
+  const jobsData = [
+    [{ jobNumber: 2, startTime: 0, endTime: 10 } ],
+    [{ jobNumber: 3, startTime: 0, endTime: 20 }],
+    [{ jobNumber: 1, startTime: 0, endTime: 30 }]
+  ];
+  
+  // Call this function after the page has loaded, or after the jobs data is ready
+  drawGanttChart(jobsData, 'ganttChartCanvas', jobsData);
+  
