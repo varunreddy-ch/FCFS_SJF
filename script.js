@@ -197,40 +197,78 @@ function addRows() {
 
 
 
-  function drawGanttChart(jobsData, canvasId, jobsData) {
+
+
+function drawGanttChart(jobsData, canvasId, jobsData) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext('2d');
     
-    // Set the width and height of the canvas
-    canvas.width = 500;
-    canvas.height = 200;
+    // Set canvas dimensions
+    canvas.width = 600;
+    canvas.height = 300;
     
-    const cpuHeight = canvas.height / jobsData.length; // Height of each CPU row
-    const maxTime = Math.max(...jobsData.map(cpu => Math.max(...cpu.map(job => job.endTime))));
-    const timeScale = canvas.width / maxTime; // Scale to fit all jobs in the canvas width
+    const margin = { top: 20, right: 20, bottom: 40, left: 40 };
+    const chartWidth = canvas.width - margin.left - margin.right;
+    const chartHeight = canvas.height - margin.top - margin.bottom;
+    const cpuHeight = chartHeight / jobsData.length; // Height of each CPU row
     
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-    
+    const maxTime = Math.max(...jobsData.flatMap(cpu => cpu.map(job => job.endTime)));
+    const timeScale = chartWidth / maxTime; // Pixels per time unit
+  
+    // Clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+    // Draw the x and y axes
+    ctx.beginPath();
+    ctx.moveTo(margin.left, margin.top);
+    ctx.lineTo(margin.left, canvas.height - margin.bottom);
+    ctx.lineTo(canvas.width - margin.right, canvas.height - margin.bottom);
+    ctx.stroke();
+  
     // Draw the jobs on the canvas
     jobsData.forEach((cpuJobs, cpuIndex) => {
       cpuJobs.forEach(job => {
-        const startX = job.startTime * timeScale;
+        const startX = margin.left + job.startTime * timeScale;
         const jobWidth = (job.endTime - job.startTime) * timeScale;
-        
+  
         // Draw the job rectangle
-        ctx.beginPath();
-        ctx.rect(startX, cpuHeight * cpuIndex, jobWidth, cpuHeight - 5);
-        ctx.fillStyle = getRandomColor(); // Get a random color for each job
-        ctx.fill();
-        ctx.stroke();
-        
+        ctx.fillStyle = getRandomColor();
+        ctx.fillRect(startX, margin.top + cpuHeight * cpuIndex, jobWidth, cpuHeight - 5);
+  
         // Add text (job name) on the rectangle
         ctx.fillStyle = 'black';
-        ctx.fillText(`J${job.jobNumber}`, startX + 5, cpuHeight * cpuIndex + cpuHeight / 2);
+        ctx.fillText(`J${job.jobNumber}`, startX + 5, margin.top + cpuHeight * cpuIndex + cpuHeight / 2);
       });
     });
+  
+    // Draw labels on axes
+    ctx.textAlign = 'center';
+    for (let i = 0; i <= maxTime; i += Math.round(maxTime / 10)) {
+      const x = margin.left + i * timeScale;
+      const y = canvas.height - margin.bottom + 15;
+      ctx.fillText(i, x, y);
+    }
+  
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let i = 0; i < jobsData.length; i++) {
+      const x = margin.left - 10;
+      const y = margin.top + cpuHeight * i + cpuHeight / 2;
+      ctx.fillText(`CPU-${i + 1}`, x, y);
+    }
   }
   
+  function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+
+
+
   function getRandomColor() {
     // Random color for the job rectangles
     const letters = '0123456789ABCDEF';
