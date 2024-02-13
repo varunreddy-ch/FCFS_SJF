@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Scheduling Calculator</title>
+<link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+<h2>Job Scheduling Calculator</h2>
+
+<p><strong>No.of CPUs:</strong>
+  <input onchange="changeCPU" id="noOfCPUs" type="number" value="3" min="1"><br><br>
+</p>
+
+<p>
+  <button onclick="addRows()">Add Jobs</button>
+  <button onclick="removeRows()">Remove last Jobs</button>
+  <button onclick="calculateSchedule('FCFS')">Calculate FCFS</button>
+  <button onclick="calculateSchedule('SJF')">Calculate SJF</button>
+</p>
+
+<table id="jobsTable">
+  <tr>
+    <th>#Jobs</th>
+    <th>Arrival Time</th>
+    <th>Burst Time</th>
+    <th>Start Time</th>
+    <th>End Time</th>
+    <th>Turnaround Time</th>
+  </tr>
+  <!-- Table rows will be added here dynamically -->
+</table>
+
+<p><strong>Total Turnaround Time:</strong> <span id="totalTurnaroundTime">0</span></p>
+<script src="script.js"></script>
+</body>
+</html>
