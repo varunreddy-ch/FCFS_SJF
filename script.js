@@ -1,8 +1,10 @@
 
 let count = 0;
 
-
-
+function hangeCPU()
+{
+    console.log("CPU changed")
+}
 function addRows() { 
 
     const table = document.getElementById('jobsTable');
@@ -47,6 +49,7 @@ function addRows() {
       const table = document.getElementById('jobsTable');
       const noOfCPUs = parseInt(document.getElementById('noOfCPUs').value, 10);
       let cpus = new Array(noOfCPUs).fill(0); // Track end time for each CPU
+      let jobs = [];
       let totalTurnaroundTime = 0;
 
 
@@ -55,37 +58,80 @@ function addRows() {
       for(let i=0; i < noOfCPUs; i++) {
         jobsData.push([]);
       }
-  
-      for (let i = 1; i < table.rows.length; i++) {
-          const row = table.rows[i];
-          const arrivalTime = parseInt(row.cells[1].childNodes[0].value, 10);
-          const burstTime = parseInt(row.cells[2].childNodes[0].value, 10);
-  
-          // Find the first available CPU or the one that will be available the earliest
-          const cpuIndex = cpus.indexOf(Math.min(...cpus));
-          const startTime = Math.max(cpus[cpuIndex], arrivalTime);
-          const endTime = startTime + burstTime;
-          const turnaroundTime = endTime - arrivalTime;
-  
-          // Update table with calculated times
-          row.cells[3].innerText = startTime;
-          row.cells[4].innerText = endTime;
-          row.cells[5].innerText = turnaroundTime;
-  
-          // Update CPU end time to the end time of the current job
-          cpus[cpuIndex] = endTime;
-  
-          // Accumulate total turnaround time
-          totalTurnaroundTime += turnaroundTime;
 
-          
-          jobsData[cpuIndex].push({ jobNumber: i, startTime: startTime, endTime: endTime })
-          drawGanttChart(jobsData, 'ganttChartCanvas', jobsData);
-      }
+
+      // Extract jobs data from the table
+      for (let i = 1; i < table.rows.length; i++) {
+        const row = table.rows[i];
+        const arrivalTime = parseInt(row.cells[1].childNodes[0].value, 10);
+        const burstTime = parseInt(row.cells[2].childNodes[0].value, 10);
+        jobs.push({ row, arrivalTime, burstTime, startTime: 0, endTime: 0, index:i, isDone: false });
+    }
+
   
-      // Display total turnaround time
-      document.getElementById('totalTurnaroundTime').innerText = totalTurnaroundTime/count;
-  }
+    let temp = 0;
+    while(temp != count) {
+          let cpuMinIndex = cpus.indexOf(Math.min(...cpus));
+
+          let tempJob = [];
+          for( let i = 0; i <  jobs.length; i++ ) {
+              if(!jobs[i].isDone && jobs[i].arrivalTime <= cpus[cpuMinIndex]) {
+                  tempJob.push({ row: jobs[i].row, arrivalTime: jobs[i].arrivalTime, burstTime: jobs[i].burstTime, startTime: jobs[i].startTime, endTime: jobs[i].endTime, index:jobs[i].index+1, isDone: jobs[i].isDone });
+              }
+          }
+
+          if(tempJob.length > 0 ){
+      
+              // Sort jobs by burst time
+              tempJob.sort((a, b) => a.arrivalTime - b.arrivalTime);
+              console.log("tempJob:");
+              console.log(tempJob);
+
+
+
+              let job1 = tempJob[0];
+              console.log("job1");
+              console.log(job1);
+
+
+              const cpuIndex = cpus.indexOf(Math.min(...cpus));
+              const startTime = Math.max(cpus[cpuIndex], job1.arrivalTime);
+              const endTime = startTime + job1.burstTime;
+              const turnaroundTime = endTime - job1.arrivalTime;
+      
+              // Update table with calculated times
+              jobs[job1.index-2].row.cells[3].innerText = startTime;
+              jobs[job1.index-2].row.cells[4].innerText = endTime;
+              jobs[job1.index-2].row.cells[5].innerText = turnaroundTime;
+              
+              jobs[job1.index-2].isDone = true;
+              // Update CPU end time to the end time of the current job
+              console.log("jobs:")
+              console.log(jobs);
+              cpus[cpuIndex] = endTime;
+      
+              // Accumulate total turnaround time
+              totalTurnaroundTime += turnaroundTime;
+
+
+
+
+              // Adding data to plot chart
+
+              jobsData[cpuIndex].push({ jobNumber: job1.index-1, startTime: startTime, endTime: endTime })
+              
+              temp++;
+          }
+          else {
+              const cpuIndex = cpus.indexOf(Math.min(...cpus));
+              cpus[cpuIndex]++;
+          }
+    }
+    
+    drawGanttChart(jobsData, 'ganttChartCanvas', jobsData);
+  // Display total turnaround time
+  document.getElementById('totalTurnaroundTime').innerText = totalTurnaroundTime/count;
+}
 
   
   // SJF Calculation
@@ -123,7 +169,7 @@ function addRows() {
                 }
             }
 
-            if(tempJob .length > 0 ){
+            if(tempJob.length > 0 ){
         
                 // Sort jobs by burst time
                 tempJob.sort((a, b) => a.burstTime - b.burstTime);
@@ -156,13 +202,9 @@ function addRows() {
                 // Accumulate total turnaround time
                 totalTurnaroundTime += turnaroundTime;
 
-
-
-
                 // Adding data to plot chart
 
                 jobsData[cpuIndex].push({ jobNumber: job1.index-1, startTime: startTime, endTime: endTime })
-                drawGanttChart(jobsData, 'ganttChartCanvas', jobsData);
                 temp++;
             }
             else {
@@ -170,26 +212,9 @@ function addRows() {
                 cpus[cpuIndex]++;
             }
       }
+
       
-    //   for (const job of jobs) {
-    //       // Find the first available CPU or the one that will be available the earliest
-    //       const cpuIndex = cpus.indexOf(Math.min(...cpus));
-    //       const startTime = Math.max(cpus[cpuIndex], job.arrivalTime);
-    //       const endTime = startTime + job.burstTime;
-    //       const turnaroundTime = endTime - job.arrivalTime;
-  
-    //       // Update table with calculated times
-    //       job.row.cells[3].innerText = startTime;
-    //       job.row.cells[4].innerText = endTime;
-    //       job.row.cells[5].innerText = turnaroundTime;
-  
-    //       // Update CPU end time to the end time of the current job
-    //       cpus[cpuIndex] = endTime;
-  
-    //       // Accumulate total turnaround time
-    //       totalTurnaroundTime += turnaroundTime;
-    // }
-  
+      drawGanttChart(jobsData, 'ganttChartCanvas', jobsData);
     // Display total turnaround time
     document.getElementById('totalTurnaroundTime').innerText = totalTurnaroundTime/count;
   }
@@ -202,7 +227,6 @@ function addRows() {
 function drawGanttChart(jobsData, canvasId, jobsData) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext('2d');
-    
     // Set canvas dimensions
     canvas.width = 600;
     canvas.height = 300;
@@ -243,11 +267,22 @@ function drawGanttChart(jobsData, canvasId, jobsData) {
   
     // Draw labels on axes
     ctx.textAlign = 'center';
-    for (let i = 0; i <= maxTime; i += Math.round(maxTime / 10)) {
-      const x = margin.left + i * timeScale;
-      const y = canvas.height - margin.bottom + 15;
-      ctx.fillText(i, x, y);
+
+    // console.log(maxTime);
+
+
+    if( maxTime > 0) {
+        for (let i = 0; i <= maxTime; i += Math.round(maxTime / 10)) {
+            const x = margin.left + i * timeScale;
+            const y = canvas.height - margin.bottom + 15;
+            ctx.fillText(i, x, y);
+          }
     }
+    
+
+    
+    // console.log(jobsData);
+    // return;
   
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
@@ -256,6 +291,9 @@ function drawGanttChart(jobsData, canvasId, jobsData) {
       const y = margin.top + cpuHeight * i + cpuHeight / 2;
       ctx.fillText(`CPU-${i + 1}`, x, y);
     }
+
+
+    
   }
   
   function getRandomColor() {
