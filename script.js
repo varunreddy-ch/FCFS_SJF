@@ -35,6 +35,18 @@ function addRows() {
     }
   }
   
+  // Add event listeners to the buttons
+document.getElementById('FCFS').addEventListener('click', function () {
+  this.style.backgroundColor = 'lightblue'; // Change FCFS button color
+  document.getElementById('SJF').style.backgroundColor = 'white'; // Reset SJF button color
+  calculateSchedule('FCFS');
+});
+
+document.getElementById('SJF').addEventListener('click', function () {
+  this.style.backgroundColor = 'lightgreen'; // Change SJF button color
+  document.getElementById('FCFS').style.backgroundColor = 'white'; // Reset FCFS button color
+  calculateSchedule('SJF');
+});
   // Common function to calculate the schedule based on the selected method
   function calculateSchedule(method) {
     if (method === 'FCFS') {
