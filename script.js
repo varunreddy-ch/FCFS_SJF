@@ -84,14 +84,14 @@ function addRows() {
       
               // Sort jobs by burst time
               tempJob.sort((a, b) => a.arrivalTime - b.arrivalTime);
-              console.log("tempJob:");
-              console.log(tempJob);
+              // console.log("tempJob:");
+              // console.log(tempJob);
 
 
 
               let job1 = tempJob[0];
-              console.log("job1");
-              console.log(job1);
+              // console.log("job1");
+              // console.log(job1);
 
 
               const cpuIndex = cpus.indexOf(Math.min(...cpus));
@@ -106,8 +106,8 @@ function addRows() {
               
               jobs[job1.index-2].isDone = true;
               // Update CPU end time to the end time of the current job
-              console.log("jobs:")
-              console.log(jobs);
+              // console.log("jobs:")
+              // console.log(jobs);
               cpus[cpuIndex] = endTime;
       
               // Accumulate total turnaround time
@@ -173,14 +173,14 @@ function addRows() {
         
                 // Sort jobs by burst time
                 tempJob.sort((a, b) => a.burstTime - b.burstTime);
-                console.log("tempJob:");
-                console.log(tempJob);
+                // console.log("tempJob:");
+                // console.log(tempJob);
 
 
 
                 let job1 = tempJob[0];
-                console.log("job1");
-                console.log(job1);
+                // console.log("job1");
+                // console.log(job1);
 
 
                 const cpuIndex = cpus.indexOf(Math.min(...cpus));
@@ -195,8 +195,8 @@ function addRows() {
                 
                 jobs[job1.index-2].isDone = true;
                 // Update CPU end time to the end time of the current job
-                console.log("jobs:")
-                console.log(jobs);
+                // console.log("jobs:")
+                // console.log(jobs);
                 cpus[cpuIndex] = endTime;
         
                 // Accumulate total turnaround time
@@ -270,12 +270,13 @@ function drawGanttChart(jobsData, canvasId, jobsData) {
 
     // console.log(maxTime);
 
-
+    // Math.round(maxTime / 10)
     if( maxTime > 0) {
-        for (let i = 0; i <= maxTime; i += Math.round(maxTime / 10)) {
+        for (let i = 0; i <= maxTime; i += (Math.round(maxTime / 10)+1)) {
             const x = margin.left + i * timeScale;
             const y = canvas.height - margin.bottom + 15;
             ctx.fillText(i, x, y);
+            // console.log("check");
           }
     }
     
