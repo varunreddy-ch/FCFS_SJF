@@ -29,8 +29,8 @@ function addRows() {
   function removeRows() {
     const table = document.getElementById('jobsTable');
     const lastRow = table.rows[table.rows.length - 1]; // Get the last row
-    table.deleteRow(table.rows.length - 1); // Delete the last row
     if (count > 0) {
+      table.deleteRow(table.rows.length - 1); // Delete the last row
       count--; // Decrease the job count if there are more than one row
     }
   }
@@ -51,13 +51,16 @@ function addRows() {
       let cpus = new Array(noOfCPUs).fill(0); // Track end time for each CPU
       let jobs = [];
       let totalTurnaroundTime = 0;
-
-
       
       let jobsData = []
       for(let i=0; i < noOfCPUs; i++) {
         jobsData.push([]);
       }
+
+
+      
+      let jobQueue = [];
+      let jobQueueAddedTime = new Set()
 
 
       // Extract jobs data from the table
@@ -113,11 +116,29 @@ function addRows() {
               // Accumulate total turnaround time
               totalTurnaroundTime += turnaroundTime;
 
+            
+              // const jobQueue = [
+              //   {2: [1, 2]},
+              //   {4: [3]},
+              //   {12: [4,5]}
+              // ];
 
 
+              // console.log(jobQueueAddedTime)
+              // console.log(startTime in jobQueueAddedTime)
 
-              // Adding data to plot chart
+              if(!(jobQueueAddedTime.has(startTime))) {
+                let tempjobQueue = {};
+                tempjobQueue[startTime] = [];
 
+                for(let i=0; i< tempJob.length; i++) {
+                  tempjobQueue[startTime].push(tempJob[i].index-1);
+                }
+                jobQueue.push(tempjobQueue);
+              }
+              jobQueueAddedTime.add(startTime);
+
+              // console.log(jobQueueAddedTime.has(startTime));
               jobsData[cpuIndex].push({ jobNumber: job1.index-1, startTime: startTime, endTime: endTime })
               
               temp++;
@@ -128,7 +149,7 @@ function addRows() {
           }
     }
     
-    drawGanttChart(jobsData, 'ganttChartCanvas', jobsData);
+    drawGanttChart(jobsData, 'ganttChartCanvas', jobQueue);
   // Display total turnaround time
   document.getElementById('totalTurnaroundTime').innerText = totalTurnaroundTime/count;
 }
@@ -149,6 +170,13 @@ function addRows() {
       }
     
   
+
+      
+      let jobQueue = [];
+      let jobQueueAddedTime = new Set()
+
+
+
       // Extract jobs data from the table
       for (let i = 1; i < table.rows.length; i++) {
           const row = table.rows[i];
@@ -202,7 +230,29 @@ function addRows() {
                 // Accumulate total turnaround time
                 totalTurnaroundTime += turnaroundTime;
 
-                // Adding data to plot chart
+                
+            
+              // const jobQueue = [
+              //   {2: [1, 2]},
+              //   {4: [3]},
+              //   {12: [4,5]}
+              // ];
+
+
+              // console.log(jobQueueAddedTime)
+              // console.log(startTime in jobQueueAddedTime)
+
+              if(!(jobQueueAddedTime.has(startTime))) {
+                let tempjobQueue = {};
+                tempjobQueue[startTime] = [];
+
+                for(let i=0; i< tempJob.length; i++) {
+                  tempjobQueue[startTime].push(tempJob[i].index-1);
+                }
+                jobQueue.push(tempjobQueue);
+              }
+              jobQueueAddedTime.add(startTime);
+
 
                 jobsData[cpuIndex].push({ jobNumber: job1.index-1, startTime: startTime, endTime: endTime })
                 temp++;
@@ -214,7 +264,7 @@ function addRows() {
       }
 
       
-      drawGanttChart(jobsData, 'ganttChartCanvas', jobsData);
+      drawGanttChart(jobsData, 'ganttChartCanvas', jobQueue);
     // Display total turnaround time
     document.getElementById('totalTurnaroundTime').innerText = totalTurnaroundTime/count;
   }
@@ -224,16 +274,16 @@ function addRows() {
 
 
 
-function drawGanttChart(jobsData, canvasId, jobsData) {
+function drawGanttChart(jobsData, canvasId, jobQueue) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext('2d');
     // Set canvas dimensions
     canvas.width = 600;
-    canvas.height = 300;
+    canvas.height = 600;
     
     const margin = { top: 20, right: 20, bottom: 40, left: 40 };
     const chartWidth = canvas.width - margin.left - margin.right;
-    const chartHeight = canvas.height - margin.top - margin.bottom;
+    const chartHeight = canvas.height - margin.top - margin.bottom -300;
     const cpuHeight = chartHeight / jobsData.length; // Height of each CPU row
     
     const maxTime = Math.max(...jobsData.flatMap(cpu => cpu.map(job => job.endTime)));
@@ -245,8 +295,8 @@ function drawGanttChart(jobsData, canvasId, jobsData) {
     // Draw the x and y axes
     ctx.beginPath();
     ctx.moveTo(margin.left, margin.top);
-    ctx.lineTo(margin.left, canvas.height - margin.bottom);
-    ctx.lineTo(canvas.width - margin.right, canvas.height - margin.bottom);
+    ctx.lineTo(margin.left, canvas.height - margin.bottom -300);
+    ctx.lineTo(canvas.width - margin.right, canvas.height - margin.bottom -300);
     ctx.stroke();
   
     // Draw the jobs on the canvas
@@ -274,11 +324,40 @@ function drawGanttChart(jobsData, canvasId, jobsData) {
     if( maxTime > 0) {
         for (let i = 0; i <= maxTime; i += (Math.round(maxTime / 10)+1)) {
             const x = margin.left + i * timeScale;
-            const y = canvas.height - margin.bottom + 15;
+            const y = canvas.height - margin.bottom + 15 -300;
+            // ctx.fillText(i, x, y);
             ctx.fillText(i, x, y);
             // console.log("check");
           }
     }
+
+      // console.log("jobQueue")
+      console.log(jobQueue);
+
+      for (let j=0; j < jobQueue.length; j++) {
+        let item = jobQueue[j];
+        // console.log(item);
+
+        let i = Object.keys(item)[0];
+
+        let iInInt = parseInt(Object.keys(item)[0]);
+        // Add time in new line
+        const x = margin.left + i * timeScale;
+        const y = canvas.height - margin.bottom + 45 -300;
+        // ctx.fillText(i, x, y);
+        ctx.fillText(iInInt, x, y);
+        // console.log("check");
+
+
+        for(let k=0; k < item[i].length; k++){
+          const x = margin.left + i * timeScale;
+          const y = canvas.height - margin.bottom -300 + 65 + 15*k;
+          // ctx.fillText(i, x, y);
+          ctx.fillText("J" + item[i][k], x, y);
+          // console.log("check");
+        }
+
+      }
     
 
     
@@ -326,7 +405,11 @@ function drawGanttChart(jobsData, canvasId, jobsData) {
     [{ jobNumber: 3, startTime: 0, endTime: 20 }],
     [{ jobNumber: 1, startTime: 0, endTime: 30 }]
   ];
+
+  const jobQueue = [
+    {0: [1, 2, 3]}
+  ];
   
   // Call this function after the page has loaded, or after the jobs data is ready
-  drawGanttChart(jobsData, 'ganttChartCanvas', jobsData);
+  drawGanttChart(jobsData, 'ganttChartCanvas', jobQueue);
   
