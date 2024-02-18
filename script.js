@@ -1,6 +1,57 @@
 
 let count = 0;
 
+// Arrays of diffferent colors
+// const highlightColors = [
+//   '#FFD700', // Gold
+//   '#AFEEEE', // PaleTurquoise
+//   '#7FFFD4', // Aquamarine
+//   '#D8BFD8', // Thistle
+//   '#FFA07A', // LightSalmon
+//   '#20B2AA', // LightSeaGreen
+//   '#87CEFA', // LightSkyBlue
+//   '#F08080', // LightCoral
+//   '#E6E6FA', // Lavender
+//   '#FAFAD2', // LightGoldenrodYellow
+//   '#90EE90', // LightGreen
+//   '#FFB6C1', // LightPink
+//   '#B0E0E6', // PowderBlue
+//   '#FFA500', // Orange
+//   '#FFDAB9'  // PeachPuff
+// ];
+
+
+
+const highlightColors = [
+  '#FFCCCC', // Light Red
+  '#FFE4E1', // Misty Rose
+  '#FFCC99', // Light Orange
+  '#FFFF99', // Light Yellow
+  '#FFFFCC', // Lighter Yellow
+  '#F0FFF0', // Honeydew
+  '#CCFFCC', // Light Green
+  '#CCFF99', // Light Lime
+  '#99FF99', // Pale Green
+  '#AFEEEE', // Pale Turquoise
+  '#ADD8E6', // Light Blue
+  '#B0E0E6', // Powder Blue
+  '#CCCCFF', // Light Periwinkle
+  '#E0FFFF', // Light Cyan
+  '#F0FFFF', // Azure
+  '#F5F5DC', // Beige
+  '#FAEBD7', // Antique White
+  '#F5F5F5', // White Smoke
+  '#FFF0F5', // Lavender Blush
+  '#FFE4B5', // Moccasin
+  '#FFDAB9', // Peach Puff
+  '#FFFACD', // Lemon Chiffon
+  '#FFF5EE', // Seashell
+  '#F0E68C', // Khaki
+  '#E6E6FA', // Lavender
+];
+
+
+
 function hangeCPU()
 {
     console.log("CPU changed")
@@ -318,7 +369,9 @@ function drawGanttChart(jobsData, canvasId, jobQueue) {
         const jobWidth = (job.endTime - job.startTime) * timeScale;
   
         // Draw the job rectangle
-        ctx.fillStyle = getRandomColor();
+        // ctx.fillStyle = getRandomColor();
+        console.log((job.jobNumber-1)%25);
+        ctx.fillStyle = highlightColors[(job.jobNumber-1)%25];
         ctx.fillRect(startX, margin.top + cpuHeight * cpuIndex, jobWidth, cpuHeight - 5);
   
         // Add text (job name) on the rectangle
@@ -388,14 +441,7 @@ function drawGanttChart(jobsData, canvasId, jobQueue) {
     
   }
   
-  function getRandomColor() {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
+
 
 
 
@@ -406,7 +452,8 @@ function drawGanttChart(jobsData, canvasId, jobQueue) {
     for (let i = 0; i < 6; i++) {
       color += letters[Math.floor(Math.random() * 16)];
     }
-    return color;
+    // return color;
+    return "#61aacc";
   }
   
   // Example usage:
