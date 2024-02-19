@@ -341,11 +341,11 @@ function drawGanttChart(jobsData, canvasId, jobQueue) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext('2d');
     // Set canvas dimensions
-    canvas.width = 600;
+    canvas.width = 600 + 400;
     canvas.height = 600;
     
     const margin = { top: 20, right: 20, bottom: 40, left: 40 };
-    const chartWidth = canvas.width - margin.left - margin.right;
+    const chartWidth = canvas.width + 400 - margin.left - margin.right;
     const chartHeight = canvas.height - margin.top - margin.bottom -300;
     const cpuHeight = chartHeight / jobsData.length; // Height of each CPU row
     
@@ -357,15 +357,20 @@ function drawGanttChart(jobsData, canvasId, jobQueue) {
   
     // Draw the x and y axes
     ctx.beginPath();
-    ctx.moveTo(margin.left, margin.top);
-    ctx.lineTo(margin.left, canvas.height - margin.bottom -300);
-    ctx.lineTo(canvas.width - margin.right, canvas.height - margin.bottom -300);
+    ctx.moveTo(margin.left + 20, margin.top);
+    ctx.lineTo(margin.left + 20, canvas.height - margin.bottom -300);
+    ctx.lineTo(canvas.width + 400 - margin.right, canvas.height - margin.bottom -300);
     ctx.stroke();
   
+    console.log(ctx.font)
+    // 10px sans-serif
+    ctx.font = "12px sans-serif"
+
+    
     // Draw the jobs on the canvas
     jobsData.forEach((cpuJobs, cpuIndex) => {
       cpuJobs.forEach(job => {
-        const startX = margin.left + job.startTime * timeScale;
+        const startX = margin.left + 20 + job.startTime * timeScale;
         const jobWidth = (job.endTime - job.startTime) * timeScale;
   
         // Draw the job rectangle
@@ -388,7 +393,7 @@ function drawGanttChart(jobsData, canvasId, jobQueue) {
     // Math.round(maxTime / 10)
     if( maxTime > 0) {
         for (let i = 0; i <= maxTime; i += (Math.round(maxTime / 10)+1)) {
-            const x = margin.left + i * timeScale;
+            const x = margin.left + 20 + i * timeScale;
             const y = canvas.height - margin.bottom + 15 -300;
             // ctx.fillText(i, x, y);
             ctx.fillText(i, x, y);
@@ -407,7 +412,7 @@ function drawGanttChart(jobsData, canvasId, jobQueue) {
 
         let iInInt = parseInt(Object.keys(item)[0]);
         // Add time in new line
-        const x = margin.left + i * timeScale;
+        const x = margin.left +20 + i * timeScale;
         const y = canvas.height - margin.bottom + 45 -300;
         // ctx.fillText(i, x, y);
         ctx.fillText(iInInt, x, y);
@@ -415,7 +420,7 @@ function drawGanttChart(jobsData, canvasId, jobQueue) {
 
 
         for(let k=0; k < item[i].length; k++){
-          const x = margin.left + i * timeScale;
+          const x = margin.left + 20 + i * timeScale;
           const y = canvas.height - margin.bottom -300 + 65 + 15*k;
           // ctx.fillText(i, x, y);
           ctx.fillText("J" + item[i][k], x, y);
@@ -432,7 +437,7 @@ function drawGanttChart(jobsData, canvasId, jobQueue) {
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
     for (let i = 0; i < jobsData.length; i++) {
-      const x = margin.left - 10;
+      const x = margin.left - 10 + 20;
       const y = margin.top + cpuHeight * i + cpuHeight / 2;
       ctx.fillText(`CPU-${i + 1}`, x, y);
     }
@@ -460,13 +465,13 @@ function drawGanttChart(jobsData, canvasId, jobQueue) {
   // Assuming jobsData is an array of arrays, with each sub-array representing jobs scheduled on one CPU
   // Each job object has jobNumber, startTime, and endTime properties
   const jobsData = [
-    [{ jobNumber: 2, startTime: 0, endTime: 10 } ],
-    [{ jobNumber: 3, startTime: 0, endTime: 20 }],
-    [{ jobNumber: 1, startTime: 0, endTime: 30 }]
+    // [{ jobNumber: 2, startTime: 0, endTime: 10 } ],
+    // [{ jobNumber: 3, startTime: 0, endTime: 20 }],
+    // [{ jobNumber: 1, startTime: 0, endTime: 30 }]
   ];
 
   const jobQueue = [
-    {0: [1, 2, 3]}
+    // {0: [1, 2, 3]}
   ];
   
   // Call this function after the page has loaded, or after the jobs data is ready
