@@ -341,15 +341,20 @@ function drawGanttChart(jobsData, canvasId, jobQueue) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext('2d');
     // Set canvas dimensions
-    canvas.width = 600 + 400;
+    canvas.width = 1000;
     canvas.height = 600;
     
     const margin = { top: 20, right: 20, bottom: 40, left: 40 };
-    const chartWidth = canvas.width + 400 - margin.left - margin.right;
+    const chartWidth = canvas.width - margin.left - margin.right;
     const chartHeight = canvas.height - margin.top - margin.bottom -300;
     const cpuHeight = chartHeight / jobsData.length; // Height of each CPU row
     
-    const maxTime = Math.max(...jobsData.flatMap(cpu => cpu.map(job => job.endTime)));
+    let maxTime = Math.max(...jobsData.flatMap(cpu => cpu.map(job => job.endTime)));
+
+    if(maxTime != parseInt(maxTime/50)*50) {
+      maxTime = (parseInt(maxTime/50)+1)*50;
+    }
+
     const timeScale = chartWidth / maxTime; // Pixels per time unit
   
     // Clear the canvas
@@ -359,10 +364,10 @@ function drawGanttChart(jobsData, canvasId, jobQueue) {
     ctx.beginPath();
     ctx.moveTo(margin.left + 20, margin.top);
     ctx.lineTo(margin.left + 20, canvas.height - margin.bottom -300);
-    ctx.lineTo(canvas.width + 400 - margin.right, canvas.height - margin.bottom -300);
+    ctx.lineTo(canvas.width - margin.right, canvas.height - margin.bottom -300);
     ctx.stroke();
   
-    console.log(ctx.font)
+    // console.log(ctx.font)
     // 10px sans-serif
     ctx.font = "12px sans-serif"
 
@@ -392,14 +397,25 @@ function drawGanttChart(jobsData, canvasId, jobQueue) {
 
     // Math.round(maxTime / 10)
     if( maxTime > 0) {
-        for (let i = 0; i <= maxTime; i += (Math.round(maxTime / 10)+1)) {
+        for (let i = 0; i <= maxTime; i += (Math.round(maxTime / 10)+0.00000001)) {
             const x = margin.left + 20 + i * timeScale;
             const y = canvas.height - margin.bottom + 15 -300;
             // ctx.fillText(i, x, y);
-            ctx.fillText(i, x, y);
+            ctx.fillText(parseInt(i), x, y);
             // console.log("check");
           }
     }
+
+
+    if( maxTime > 10) {
+      for (let i = 0; i <= maxTime; i += (Math.round(maxTime / 10))) {
+          const x = margin.left + 20 + i * timeScale;
+          const y = canvas.height - margin.bottom + 15 -300;
+          // ctx.fillText(i, x, y);
+          ctx.fillText(parseInt(i), x, y);
+          // console.log("check");
+        }
+  }
 
       // console.log("jobQueue")
       console.log(jobQueue);
