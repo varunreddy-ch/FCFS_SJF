@@ -347,7 +347,8 @@ function drawGanttChart(jobsData, canvasId, jobQueue) {
     const margin = { top: 20, right: 20, bottom: 40, left: 40 };
     const chartWidth = canvas.width - margin.left - margin.right;
     const chartHeight = canvas.height - margin.top - margin.bottom -300;
-    const cpuHeight = chartHeight / jobsData.length; // Height of each CPU row
+    console.log(chartHeight/jobsData.length)
+    const cpuHeight = Math.min(80, chartHeight / jobsData.length); // Height of each CPU row
     
     let maxTime = Math.max(...jobsData.flatMap(cpu => cpu.map(job => job.endTime)));
 
