@@ -341,7 +341,7 @@ function drawGanttChart(jobsData, canvasId, jobQueue) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext('2d');
     // Set canvas dimensions
-    canvas.width = 1000;
+    canvas.width = window.innerWidth - 20;
     canvas.height = 600;
     
     const margin = { top: 20, right: 20, bottom: 40, left: 40 };
